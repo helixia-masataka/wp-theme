@@ -133,14 +133,16 @@ src/assets/sass/
 │   ├── c-heading.scss
 │   ├── c-cta.scss
 │   ├── c-breadcrumb.scss
-│   └── c-drawer.scss
+│   ├── c-drawer.scss
+│   ├── c-contact.scss
+│   ├── c-popular-posts.scss
+│   └── c-to-top.scss
 │
 ├── pages/          # ページ固有スタイル（p- プレフィックス）
 │   ├── p-home.scss     # トップページ
-│   ├── p-home-mv.scss  # トップMV（Critical CSS用）
 │   ├── p-contact.scss  # お問い合わせ
 │   ├── p-page.scss     # 固定ページ共通
-│   └── p-static.scss   # プライバシーポリシー等
+│   └── p-static.scss   # 404・プライバシー・サンクスページ共通
 │
 ├── critical.scss   # Critical CSSエントリポイント（ファーストビューのみ）
 └── style.scss      # メインエントリポイント（全ファイルを読み込む）
@@ -267,9 +269,11 @@ get_template_part('template-parts/template-footer');
 
 ---
 
-## 7. inc/ 各ファイルの設定変更ポイント
+## 7. inc/ 統合ファイルと各種設定の変更ポイント
 
-### seo.php — SEO・OGPの設定
+機能ごとに分離されていた `inc/` フォルダのファイル群は、**9つの統合ファイル** にまとめられています。
+
+### seo.php — SEO・OGP・サイトマップの設定
 
 ほぼ自動ですが、以下は確認・変更が必要。
 
@@ -278,7 +282,7 @@ get_template_part('template-parts/template-footer');
 $image = get_theme_file_uri('/img/ogp-default.webp');
 ```
 
-### root.scss — カラー・フォントの変更
+### root.scss — カラー・CSS変数の変更
 
 **最もよく変更するファイル**。デザインカンプの配色に合わせて `①カラーパレット` の値を変更する。
 
@@ -290,7 +294,9 @@ $image = get_theme_file_uri('/img/ogp-default.webp');
 // ダークモードも自動で適用される
 ```
 
-### fonts.php — Google Fontsの変更
+### performance.php — パフォーマンス最適化・フォント設定
+
+LCP改善やGoogle Fonts最適化（旧 `fonts.php` や `speed.php` の機能）を含みます。フォントを変更する場合は以下のURL等を更新します。
 
 ```php
 // フォントを変更する場合はこの2つのURLを更新
@@ -309,13 +315,13 @@ echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?...">';
 
 コードを直接書かず、**WordPress管理画面 → カスタマイズ → アナリティクス設定** からIDを入力するだけ。
 
-### speed.php — Main Visual画像のpreload
+### helper-frontend.php — UIアシスト機能
 
-`front-page.php` で設定したグローバル変数を読み取るため、通常は変更不要。
+ページタイプの取得、ページネーション、Contact Form 7の設定（`contactform.php`）などが一つにまとまっています。
 
 ### critical.scss — Critical CSSの内容
 
-ファーストビューが変わった場合（ヘッダー構成変更、MVの廃止など）はこのファイルの `@use` を更新する。
+ファーストビューが変わった場合（ヘッダー構成変更など）はこのファイルの `@use` を更新する。現在はトップページ（`p-home.scss`）がインクルードされています。
 
 ---
 
@@ -373,12 +379,12 @@ src/assets/js/service.js を作成
 
 | プラグイン                                   | 用途                                                         |
 | -------------------------------------------- | ------------------------------------------------------------ |
-| **Contact Form 7**                           | お問い合わせフォーム（`contactform.php` と連携済み）         |
-| **All-in-One WP Migration**                  | バックアップ・移行（`exclude-aio-migration.php` で設定済み） |
+| **Contact Form 7**                           | お問い合わせフォーム（`helper-frontend.php` と連携済み）         |
+| **All-in-One WP Migration**                  | バックアップ・移行（`admin-tools.php` で除外設定済み） |
 | **All-In-One Security & Firewall**           | WAF・ログイン保護（テーマではカバーできないサーバー保護）    |
 | **WP Multibyte Patch**                       | 日本語WordPress環境での文字化け防止                          |
 
-> ⚠️ **Yoast SEO / All in One SEO / GA系プラグインは入れない。** テーマ内ですでに対応しているため、重複して機能が競合します。
+> ⚠️ **Yoast SEO / All in One SEO / GA系プラグインは入れない。** テーマ内の `seo.php` や `analytics.php` で機能がサポートされており、競合してエラーになるため。
 
 ---
 
@@ -391,7 +397,7 @@ src/assets/js/service.js を作成
 | `style.css` のTheme情報以外を編集        | コンパイル済みファイルのため上書きされる             |
 | `functions.php` に大量のコードを直接書く | `inc/` に機能別ファイルを追加する設計のため          |
 | `wp_head()` や `wp_footer()` を削除      | テーマ全機能が動作しなくなる                         |
-| WordPress標準のjQueryをenqueue           | `speed.php` で削除済み（独自実装にJQuery依存は禁止） |
+| WordPress標準のjQueryをenqueue           | `performance.php` で削除済み（独自実装にjQuery依存は禁止） |
 
 ---
 
