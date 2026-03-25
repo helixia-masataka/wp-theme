@@ -25,7 +25,13 @@
 // 【注意】このファイルに直接コードを大量に書かず、
 //         機能ごとに inc/ フォルダへ分割することを強く推奨
 
-
+/**
+ * Critical CSS の読み込み設定
+ * true  : 常に読み込む
+ * false : 常に読み込まない
+ * null  : 本番環境（WP_DEBUG=false）の時のみ読み込む（デフォルト）
+ */
+define('HELIXIA_CRITICAL_CSS', null);
 
 // 読み込みたいファイル名を配列にまとめる（統合済み：23→9ファイル）
 $inc_files = array(
